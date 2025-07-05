@@ -166,7 +166,6 @@ export default function BudgetManager() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Target className="h-5 w-5" />
             Budget Management
           </h3>
           <p className="text-sm text-muted-foreground">
