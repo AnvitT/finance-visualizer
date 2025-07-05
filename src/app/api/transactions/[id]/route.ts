@@ -5,11 +5,12 @@ import Category from "@/models/Category";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
-    const deleted = await Transaction.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const deleted = await Transaction.findByIdAndDelete(id);
     
     if (!deleted) {
       return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
@@ -23,10 +24,11 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
+    const { id } = await params;
     const { amount, date, description, category } = await req.json();
     
     if (!amount || !date || !description || !category) {
@@ -49,7 +51,7 @@ export async function PUT(
     }
     
     const updated = await Transaction.findByIdAndUpdate(
-      params.id,
+      id,
       { amount: parseFloat(amount), date, description: description.trim(), category },
       { new: true }
     );
