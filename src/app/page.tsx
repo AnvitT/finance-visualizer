@@ -31,6 +31,10 @@ export default function HomePage() {
     setEditingTransaction(undefined);
   };
 
+  const handleBudgetChange = () => {
+    setRefresh(prev => prev + 1);
+  };
+
   const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setOpen(true);
@@ -124,7 +128,7 @@ export default function HomePage() {
                   Manage Budgets
                 </DialogTitle>
               </DialogHeader>
-              <BudgetManager />
+              <BudgetManager onBudgetChange={handleBudgetChange} />
             </DialogContent>
           </Dialog>
 

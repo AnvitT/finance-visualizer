@@ -22,7 +22,11 @@ interface Category {
   color: string;
 }
 
-export default function BudgetManager() {
+interface BudgetManagerProps {
+  onBudgetChange?: () => void;
+}
+
+export default function BudgetManager({ onBudgetChange }: BudgetManagerProps) {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -105,6 +109,8 @@ export default function BudgetManager() {
       toast.success(editing ? "Budget updated" : "Budget set");
       resetForm();
       fetchBudgets();
+      // Notify parent component of budget change
+      onBudgetChange?.();
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -123,6 +129,8 @@ export default function BudgetManager() {
       if (!res.ok) throw new Error("Failed to delete budget");
       toast.success("Budget deleted");
       fetchBudgets();
+      // Notify parent component of budget change
+      onBudgetChange?.();
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
