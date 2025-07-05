@@ -37,3 +37,6 @@ A simple, modern web application for tracking personal finances, built with Next
 - `src/components/` - UI components and charts
 - `src/models/` - Mongoose models for MongoDB
 - `src/lib/` - Utility functions and database connection
+
+## Deployed on Vercel
+- https://finance-visualizer-eight.vercel.app/
