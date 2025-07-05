@@ -2,6 +2,7 @@
 
 
 import { useState } from "react";
+import type { Transaction } from "@/components/TransactionList";
 import TransactionForm from "@/components/AddTransaction";
 import TransactionList from "@/components/TransactionList";
 import MonthlyExpensesChart from "@/components/MonthlyExpensesChart";
@@ -13,13 +14,13 @@ import CategoryManager from "@/components/categories/CategoryManager";
 import BudgetManager from "@/components/BudgetManager";
 import BudgetVsActualChart from "@/components/BudgetVsActualChart";
 import SpendingInsights from "@/components/SpendingInsights";
-import { Settings, Plus, Target, TrendingUp } from "lucide-react";
+import { Settings, Plus, Target } from "lucide-react";
 
 
 
 export default function HomePage() {
   const [refresh, setRefresh] = useState(0);
-  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [budgetDialogOpen, setBudgetDialogOpen] = useState(false);
@@ -27,16 +28,16 @@ export default function HomePage() {
   const handleSuccess = () => {
     setRefresh(prev => prev + 1);
     setOpen(false);
-    setEditingTransaction(null);
+    setEditingTransaction(undefined);
   };
 
-  const handleEditTransaction = (transaction: any) => {
+  const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setOpen(true);
   };
 
   const handleCancelEdit = () => {
-    setEditingTransaction(null);
+    setEditingTransaction(undefined);
     setOpen(false);
   };
 
@@ -58,7 +59,7 @@ export default function HomePage() {
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  onClick={() => { setEditingTransaction(null); setOpen(true); }} 
+                  onClick={() => { setEditingTransaction(undefined); setOpen(true); }} 
                   className="flex items-center gap-2 px-6"
                   size="lg"
                 >

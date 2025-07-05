@@ -9,7 +9,7 @@ export async function GET() {
     const transactions = await Transaction.find().sort({ date: -1, createdAt: -1 });
     return NextResponse.json(transactions);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch transactions" }, { status: 500 });
+    return NextResponse.json({ error: `Failed to fetch transactions: ${error}` }, { status: 500 });
   }
 }
 
@@ -46,6 +46,6 @@ export async function POST(req: NextRequest) {
     
     return NextResponse.json(transaction);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create transaction" }, { status: 500 });
+    return NextResponse.json({ error: `Failed to create transaction: ${error}` }, { status: 500 });
   }
 }

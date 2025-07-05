@@ -7,12 +7,15 @@ export async function GET(req: Request) {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const month = searchParams.get("month");
-    let filter: any = {};
+    const filter: Record<string, unknown> = {};
     if (month) filter.month = month;
     const budgets = await Budget.find(filter).sort({ createdAt: -1 });
     return NextResponse.json(budgets);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: "Unknown error" }, { status: 500 });
   }
 }
 
@@ -37,7 +40,10 @@ export async function POST(req: Request) {
       budget = await Budget.create({ category, month, amount });
     }
     return NextResponse.json(budget);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: "Unknown error" }, { status: 500 });
   }
 }

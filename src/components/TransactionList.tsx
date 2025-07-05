@@ -7,14 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trash2, Edit2, Receipt, Loader2 } from "lucide-react";
 
-interface Transaction {
+
+export type Transaction = {
   _id: string;
   amount: number;
   date: string;
   description: string;
   category: string;
   createdAt: string;
-}
+};
 
 interface TransactionListProps {
   refresh: number;
@@ -37,8 +38,12 @@ export default function TransactionList({ refresh, onEditTransaction, onTransact
       
       const data = await res.json();
       setTransactions(data);
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -59,8 +64,12 @@ export default function TransactionList({ refresh, onEditTransaction, onTransact
       } else {
         fetchTransactions();
       }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An error occurred");
+      }
     } finally {
       setDeletingId(null);
       setDeleteDialogOpen(false);

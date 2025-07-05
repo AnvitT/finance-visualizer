@@ -2,12 +2,12 @@
 
 import TransactionForm from "@/components/AddTransaction";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import type { Transaction } from "@/components/TransactionList";
 
 interface EditTransactionProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editingTransaction: any;
+  editingTransaction?: Transaction;
   onSuccess: () => void;
   onCancelEdit: () => void;
 }

@@ -16,8 +16,13 @@ const CATEGORY_COLORS: Record<string, string> = {
   Other: "#a3a3a3"
 };
 
+interface PieChartData {
+  category: string;
+  total: number;
+}
+
 export default function CategoryPieChart({ refresh }: { refresh: number }) {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<PieChartData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +33,7 @@ export default function CategoryPieChart({ refresh }: { refresh: number }) {
         if (!res.ok) throw new Error("Failed to fetch transactions");
         const transactions = await res.json();
         const grouped: Record<string, number> = {};
-        transactions.forEach((t: any) => {
+        transactions.forEach((t: { category: string; amount: number }) => {
           grouped[t.category] = (grouped[t.category] || 0) + t.amount;
         });
         const chartData = Object.entries(grouped).map(([category, total]) => ({
@@ -36,8 +41,12 @@ export default function CategoryPieChart({ refresh }: { refresh: number }) {
           total
         }));
         setData(chartData);
-      } catch (error: any) {
-        toast.error(error.message || "An error occurred");
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -53,7 +62,12 @@ export default function CategoryPieChart({ refresh }: { refresh: number }) {
     }).format(value);
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{ payload: PieChartData; value: number }>;
+  }
+
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border rounded-lg p-3 shadow-lg">

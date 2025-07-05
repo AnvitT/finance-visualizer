@@ -28,6 +28,11 @@ interface ComparisonData {
   color: string;
 }
 
+interface Category {
+  name: string;
+  color: string;
+}
+
 export default function BudgetVsActualChart({ refresh }: { refresh: number }) {
   const [data, setData] = useState<ComparisonData[]>([]);
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -72,16 +77,20 @@ export default function BudgetVsActualChart({ refresh }: { refresh: number }) {
       const transactionsRes = await fetch(`/api/transactions`);
       const allTransactions: Transaction[] = await transactionsRes.json();
 
+
       // Filter transactions for the selected month
       const monthTransactions = allTransactions.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
-        const transactionMonth = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`;
-        return transactionMonth === selectedMonth;
+        const date = new Date(transaction.date);
+        const [year, month] = selectedMonth.split('-');
+        return (
+          date.getFullYear() === parseInt(year) &&
+          date.getMonth() + 1 === parseInt(month)
+        );
       });
 
       // Fetch categories for colors
       const categoriesRes = await fetch('/api/categories');
-      const categories = await categoriesRes.json();
+      const categories: Category[] = await categoriesRes.json();
 
       // Calculate actual spending by category
       const actualSpending: { [key: string]: number } = {};
@@ -95,14 +104,11 @@ export default function BudgetVsActualChart({ refresh }: { refresh: number }) {
 
       // Combine budget and actual data
       const comparisonData: ComparisonData[] = [];
-      
-      // Add categories that have budgets
       budgets.forEach(budget => {
         const actual = actualSpending[budget.category] || 0;
         const difference = actual - budget.amount;
         const percentage = budget.amount > 0 ? (actual / budget.amount) * 100 : 0;
-        const category = categories.find((c: any) => c.name === budget.category);
-        
+        const category = categories.find((c: Category) => c.name === budget.category);
         comparisonData.push({
           category: budget.category,
           budget: budget.amount,
@@ -116,7 +122,7 @@ export default function BudgetVsActualChart({ refresh }: { refresh: number }) {
       // Add categories that have spending but no budget
       Object.keys(actualSpending).forEach(categoryName => {
         if (!budgets.find(b => b.category === categoryName)) {
-          const category = categories.find((c: any) => c.name === categoryName);
+          const category = categories.find((c: Category) => c.name === categoryName);
           comparisonData.push({
             category: categoryName,
             budget: 0,
@@ -138,7 +144,13 @@ export default function BudgetVsActualChart({ refresh }: { refresh: number }) {
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{ payload: ComparisonData }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Target, Plus, Edit2, Trash2, TrendingUp, IndianRupee } from "lucide-react";
+import { Target, Plus, Edit2, Trash2, IndianRupee } from "lucide-react";
 
 interface Budget {
   _id: string;
@@ -63,6 +63,7 @@ export default function BudgetManager() {
       setBudgets(data);
     } catch (error) {
       toast.error("Failed to fetch budgets");
+      console.error("Error fetching budgets:", error);
     }
   }
 
@@ -73,6 +74,7 @@ export default function BudgetManager() {
       setCategories(data);
     } catch (error) {
       toast.error("Failed to fetch categories");
+      console.error("Error fetching categories:", error);
     }
   }
 
@@ -103,8 +105,12 @@ export default function BudgetManager() {
       toast.success(editing ? "Budget updated" : "Budget set");
       resetForm();
       fetchBudgets();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -117,8 +123,12 @@ export default function BudgetManager() {
       if (!res.ok) throw new Error("Failed to delete budget");
       toast.success("Budget deleted");
       fetchBudgets();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }

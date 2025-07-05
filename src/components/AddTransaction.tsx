@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { PlusCircle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -19,7 +19,13 @@ import { format } from "date-fns";
 
 interface AddTransactionProps {
   onSuccess: () => void;
-  editingTransaction?: any;
+  editingTransaction?: {
+    _id: string;
+    amount: number;
+    date: string;
+    description: string;
+    category: string;
+  };
   onCancelEdit?: () => void;
 }
 
@@ -43,7 +49,7 @@ export default function AddTransaction({
       setCategories(data);
       // If editing, keep the category, else default to 'Other' or first
       if (!editingTransaction) {
-        const other = data.find((c: any) => c.name === 'Other');
+        const other = data.find((c: { _id: string, name: string, color: string }) => c.name === 'Other');
         setCategory(other ? other.name : (data[0]?.name || 'Other'));
       }
     });
@@ -107,8 +113,12 @@ export default function AddTransaction({
       );
       onSuccess();
       if (onCancelEdit) onCancelEdit();
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || "An error occurred");
+      } else {
+        toast.error("An error occurred");
+      }
     } finally {
       setLoading(false);
     }

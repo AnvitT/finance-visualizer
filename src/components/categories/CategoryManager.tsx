@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Palette, Tag } from "lucide-react";
 
@@ -57,8 +57,12 @@ export default function CategoryManager() {
       setEditing(null);
       setAddEditDialogOpen(false);
       fetchCategories();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -71,8 +75,12 @@ export default function CategoryManager() {
       if (!res.ok) throw new Error((await res.json()).error);
       toast.success("Category deleted");
       fetchCategories();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e) {
+      if (e instanceof Error) {
+        toast.error(e.message);
+      } else {
+        toast.error("An error occurred");
+      }
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);

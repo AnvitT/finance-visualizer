@@ -31,7 +31,7 @@ export default function MonthlyExpensesChart({ refresh }: MonthlyExpensesChartPr
         
         // Group by month
         const grouped: Record<string, number> = {};
-        transactions.forEach((transaction: any) => {
+        transactions.forEach((transaction: { date: string; amount: number }) => {
           const month = transaction.date.slice(0, 7); // YYYY-MM
           grouped[month] = (grouped[month] || 0) + transaction.amount;
         });
@@ -49,8 +49,12 @@ export default function MonthlyExpensesChart({ refresh }: MonthlyExpensesChartPr
           .sort((a, b) => a.month.localeCompare(b.month));
         
         setData(chartData);
-      } catch (error: any) {
-        toast.error(error.message || "An error occurred");
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -67,7 +71,12 @@ export default function MonthlyExpensesChart({ refresh }: MonthlyExpensesChartPr
     }).format(value);
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{ payload: ChartData; value: number }>;
+  }
+
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border rounded-lg p-3 shadow-lg">

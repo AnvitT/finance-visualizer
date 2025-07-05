@@ -4,8 +4,21 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, IndianRupee, PieChart as PieChartIcon, Receipt } from "lucide-react";
 
+interface Transaction {
+  _id: string;
+  category: string;
+  amount: number;
+  description: string;
+}
+
+interface Summary {
+  total: number;
+  byCategory: Record<string, number>;
+  recent: Transaction[];
+}
+
 export default function DashboardSummary({ refresh }: { refresh: number }) {
-  const [summary, setSummary] = useState<any>({ total: 0, byCategory: {}, recent: [] });
+  const [summary, setSummary] = useState<Summary>({ total: 0, byCategory: {}, recent: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,14 +30,15 @@ export default function DashboardSummary({ refresh }: { refresh: number }) {
         const transactions = await res.json();
         let total = 0;
         const byCategory: Record<string, number> = {};
-        transactions.forEach((t: any) => {
+        transactions.forEach((t: Transaction) => {
           total += t.amount;
           byCategory[t.category] = (byCategory[t.category] || 0) + t.amount;
         });
-        const recent = transactions.slice(0, 5);
+        const recent: Transaction[] = transactions.slice(0, 5);
         setSummary({ total, byCategory, recent });
       } catch (error) {
         setSummary({ total: 0, byCategory: {}, recent: [] });
+        console.error("Error fetching summary data:", error);
       } finally {
         setLoading(false);
       }
@@ -68,9 +82,12 @@ export default function DashboardSummary({ refresh }: { refresh: number }) {
         </CardHeader>
         <CardContent>
           <ul className="space-y-1">
-            {Object.entries(summary.byCategory).sort((a: any, b: any) => b[1] - a[1]).slice(0, 3).map(([cat, amt]: any) => (
-              <li key={cat} className="flex justify-between text-sm"><span>{cat}</span><span>{formatCurrency(amt)}</span></li>
-            ))}
+            {Object.entries(summary.byCategory)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 3)
+              .map(([cat, amt]) => (
+                <li key={cat} className="flex justify-between text-sm"><span>{cat}</span><span>{formatCurrency(amt)}</span></li>
+              ))}
             {Object.keys(summary.byCategory).length === 0 && <li className="text-muted-foreground">No categories</li>}
           </ul>
         </CardContent>
@@ -82,7 +99,7 @@ export default function DashboardSummary({ refresh }: { refresh: number }) {
         </CardHeader>
         <CardContent>
           <ul className="space-y-1">
-            {summary.recent.map((t: any) => (
+            {summary.recent.map((t) => (
               <li key={t._id} className="flex justify-between text-xs">
                 <span className="truncate max-w-[120px]">{t.description}</span>
                 <span>{formatCurrency(t.amount)}</span>

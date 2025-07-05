@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Calendar, IndianRupee, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Calendar, BarChart3 } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface Transaction {
   _id: string;
@@ -25,7 +26,7 @@ interface SpendingInsight {
   title: string;
   description: string;
   value?: string;
-  icon: any;
+  icon: LucideIcon;
 }
 
 export default function SpendingInsights({ refresh }: { refresh: number }) {
